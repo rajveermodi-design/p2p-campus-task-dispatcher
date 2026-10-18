@@ -33,7 +33,13 @@ CREATE TABLE Students (
 
     -- Domain Integrity Constraints
     CONSTRAINT chk_balance_non_negative CHECK (Balance >= 0.00),
-    CONSTRAINT chk_rating_range CHECK (Trust_Rating >= 1.00 AND Trust_Rating <= 5.00)
+    CONSTRAINT chk_rating_range CHECK (Trust_Rating >= 1.00 AND Trust_Rating <= 5.00),
+
+    -- Institutional Identity Guards (Regex)
+    CONSTRAINT chk_reg_no_format 
+        CHECK (REGEXP_LIKE(Reg_No, '^[0-9]{2}[A-Z]{3}[0-9]{4}$')),
+    CONSTRAINT chk_email_domain 
+        CHECK (REGEXP_LIKE(Email, '^[A-Za-z0-9._%+-]+@vitstudent\\.ac\\.in$'))
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
 -- ----------------------------------------------------------------------------
@@ -54,11 +60,11 @@ CREATE TABLE Tasks (
     -- Primary Key
     CONSTRAINT pk_tasks PRIMARY KEY (Task_ID),
 
-    -- Foreign Key Integrity
+    -- Foreign Key Integrity (RESTRICT prevents error 3823 with CHECK constraint)
     CONSTRAINT fk_tasks_requester FOREIGN KEY (Requester_ID) 
-        REFERENCES Students(Reg_No) ON UPDATE CASCADE ON DELETE RESTRICT,
+        REFERENCES Students(Reg_No) ON DELETE RESTRICT,
     CONSTRAINT fk_tasks_runner FOREIGN KEY (Runner_ID) 
-        REFERENCES Students(Reg_No) ON UPDATE CASCADE ON DELETE RESTRICT,
+        REFERENCES Students(Reg_No) ON DELETE RESTRICT,
 
     -- Domain Integrity Constraints
     CONSTRAINT chk_requester_runner_distinct CHECK (Requester_ID <> Runner_ID),
@@ -85,7 +91,7 @@ CREATE TABLE Bids (
     CONSTRAINT fk_bids_task FOREIGN KEY (Task_ID) 
         REFERENCES Tasks(Task_ID) ON DELETE CASCADE,
     CONSTRAINT fk_bids_runner FOREIGN KEY (Runner_ID) 
-        REFERENCES Students(Reg_No) ON UPDATE CASCADE ON DELETE RESTRICT
+        REFERENCES Students(Reg_No) ON DELETE RESTRICT
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
 -- ----------------------------------------------------------------------------
