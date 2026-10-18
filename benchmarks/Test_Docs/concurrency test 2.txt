@@ -1,0 +1,19 @@
+(venv) rajveermodi@Rajveers-MacBook-Air p2p-campus-task-dispatcher % python -m benchmarks.concurrency_race_test
+
+======================================================================
+BENCHMARK 1: SIMULTANEOUS RUNNER BIDS (HIGH CONTENTION)
+======================================================================
+Runner ID       | HTTP Code  | Latency (ms)    | Server Response
+----------------------------------------------------------------------
+25BCE0724       | 409        | 86.49           | Duplicate bid: Runner has already placed an active bid on this errand.
+25BCE0717       | 409        | 86.46           | Duplicate bid: Runner has already placed an active bid on this errand.
+25BCE1002       | 201        | 92.80           | Bid submitted successfully.
+25BCE1003       | 201        | 92.86           | Bid submitted successfully.
+
+======================================================================
+BENCHMARK 2: DOUBLE-SPENDING RACE CONDITION (ESCROW PAYOUT)
+======================================================================
+Execution Thread   | HTTP Code  | Latency (ms)    | Server Response
+----------------------------------------------------------------------
+Thread-Alpha       | 400        | 6.73            | Invalid State: Task is not active or awaiting completion
+Thread-Beta        | 400        | 6.27            | Invalid State: Task is not active or awaiting completion
