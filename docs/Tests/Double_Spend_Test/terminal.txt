@@ -1,0 +1,64 @@
+Terminal 1: (server)
+
+    (venv) rajveermodi@Rajveers-MacBook-Air p2p-campus-task-dispatcher % uvicorn src.main:app --reload --port 8000
+    INFO:     Will watch for changes in these directories: ['/Users/rajveermodi/Documents/GitHub/p2p-campus-task-dispatcher']
+    INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+    INFO:     Started reloader process [60809] using WatchFiles
+    INFO:     Started server process [60811]
+    INFO:     Waiting for application startup.
+    INFO:     Application startup complete.
+    INFO:     127.0.0.1:59622 - "GET /students/25BCE0724 HTTP/1.1" 200 OK
+    INFO:     127.0.0.1:59624 - "POST /tasks/1/complete HTTP/1.1" 200 OK
+    INFO:     127.0.0.1:59625 - "POST /tasks/1/complete HTTP/1.1" 400 Bad Request
+    INFO:     127.0.0.1:59627 - "POST /tasks/1/complete HTTP/1.1" 400 Bad Request
+    INFO:     127.0.0.1:59626 - "POST /tasks/1/complete HTTP/1.1" 400 Bad Request
+    INFO:     127.0.0.1:59630 - "POST /tasks/1/complete HTTP/1.1" 400 Bad Request
+    INFO:     127.0.0.1:59632 - "POST /tasks/1/complete HTTP/1.1" 400 Bad Request
+    INFO:     127.0.0.1:59633 - "POST /tasks/1/complete HTTP/1.1" 400 Bad Request
+    INFO:     127.0.0.1:59631 - "POST /tasks/1/complete HTTP/1.1" 400 Bad Request
+    INFO:     127.0.0.1:59629 - "POST /tasks/1/complete HTTP/1.1" 400 Bad Request
+    INFO:     127.0.0.1:59628 - "POST /tasks/1/complete HTTP/1.1" 400 Bad Request
+    INFO:     127.0.0.1:59643 - "GET /students/25BCE0724 HTTP/1.1" 200 OK
+
+
+Terminal 2:
+        
+        rajveermodi@Rajveers-MacBook-Air p2p-campus-task-dispatcher % source venv/bin/activate                  
+        (venv) rajveermodi@Rajveers-MacBook-Air p2p-campus-task-dispatcher % mysql -u root -p campus_dispatcher -e "
+        UPDATE Tasks SET Status = 'assigned', Runner_ID = '25BCE0724' WHERE Task_ID = 1;
+        UPDATE Escrow_Transactions SET Escrow_State = 'HELD', Released_At = NULL WHERE Task_ID = 1;
+        "
+        Enter password: 
+    (venv) rajveermodi@Rajveers-MacBook-Air p2p-campus-task-dispatcher % python -m benchmarks.double_spend_test
+    ===========================================================================
+    STRESS BENCHMARK: HIGH-VOLUME DOUBLE-SPEND ATTACK (10 PARALLEL THREADS)
+    ===========================================================================
+    [*] Pre-Attack Balance for Runner 25BCE0724: Rs. 970.00
+    [*] Launching 10 simultaneous claims for Task #1...
+
+    Thread       | HTTP Code  | Latency (ms)    | Server Message
+    ---------------------------------------------------------------------------
+    Thread #1     | 400        | 30.50           | Invalid State: Task is not active or awaiting completion
+    Thread #2     | 400        | 31.23           | Invalid State: Task is not active or awaiting completion
+    Thread #3     | 200        | 29.80           | Verification PIN confirmed! Escrow funds released to runner wallet.
+    Thread #4     | 400        | 29.82           | Invalid State: Task is not active or awaiting completion
+    Thread #5     | 400        | 31.37           | Invalid State: Task is not active or awaiting completion
+    Thread #6     | 400        | 30.69           | Invalid State: Task is not active or awaiting completion
+    Thread #7     | 400        | 29.45           | Invalid State: Task is not active or awaiting completion
+    Thread #8     | 400        | 30.20           | Invalid State: Task is not active or awaiting completion
+    Thread #9     | 400        | 29.11           | Invalid State: Task is not active or awaiting completion
+    Thread #10    | 400        | 29.45           | Invalid State: Task is not active or awaiting completion
+
+    ===========================================================================
+    AUDIT & BALANCE INVARIANT VERIFICATION
+    ===========================================================================
+    Total Parallel Requests : 10
+    Successful Payouts      : 1 (Expected: 1)
+    Rejected Rogue Claims   : 9 (Expected: 9)
+    Total Execution Time    : 33.56 ms
+    Initial Runner Balance  : Rs. 970.00
+    Final Runner Balance    : Rs. 1030.00
+    Net Amount Disbursed    : Rs. 60.00
+
+    [VERDICT: PASS] ACID isolation held. Zero double-spending detected.
+    (venv) rajveermodi@Rajveers-MacBook-Air p2p-campus-task-dispatcher % 
