@@ -78,3 +78,52 @@ def get_student_profile(reg_no: str, db: Session = Depends(get_db)):
         "balance": result["Balance"],
         "created_at": result["Created_At"]
     }
+
+
+@router.get("/students")
+def list_students(db: Session = Depends(get_db)):
+    """Fetches all registered campus participants."""
+    rows = db.execute(
+        text("SELECT Reg_No, Name, Email, Trust_Rating, Balance, Created_At FROM Students ORDER BY Reg_No ASC")
+    ).mappings().all()
+
+    return [
+        {
+            "reg_no": row["Reg_No"],
+            "name": row["Name"],
+            "email": row["Email"],
+            "trust_rating": float(row["Trust_Rating"]),
+            "balance": float(row["Balance"]),
+            "created_at": row["Created_At"].isoformat() if row["Created_At"] else None
+        }
+        for row in rows
+    ]
+
+
+@router.post("/students/{reg_no}/deposit")
+def deposit_funds(reg_no: str, amount: float = 200.0, db: Session = Depends(get_db)):
+    """Deposits simulated wallet funds to test escrow deductions and bids."""
+    if amount <= 0:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Deposit amount must be positive.")
+
+    try:
+        db.execute(
+            text("UPDATE Students SET Balance = Balance + :amount WHERE Reg_No = :reg_no"),
+            {"reg_no": reg_no.upper(), "amount": amount}
+        )
+        db.commit()
+    except DBAPIError as e:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=extract_db_error_message(e))
+
+    # Fetch updated balance
+    row = db.execute(
+        text("SELECT Balance FROM Students WHERE Reg_No = :reg_no"),
+        {"reg_no": reg_no.upper()}
+    ).mappings().first()
+
+    if not row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found.")
+
+    return {"message": f"Successfully credited ₹{amount:.2f}", "new_balance": float(row["Balance"])}
+

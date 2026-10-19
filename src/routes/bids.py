@@ -47,3 +47,34 @@ def place_bid(task_id: int, bid: BidCreate, db: Session = Depends(get_db)):
         )
 
     return {"message": "Bid submitted successfully."}
+
+
+@router.get("/tasks/{task_id}/bids")
+def get_task_bids(task_id: int, db: Session = Depends(get_db)):
+    """
+    Returns all bids placed on a task, joined with Runner name and trust rating.
+    """
+    query = text("""
+        SELECT b.Bid_ID, b.Task_ID, b.Runner_ID, s.Name AS Runner_Name, s.Trust_Rating AS Runner_Rating,
+               b.Offered_Time, b.Bid_Status, b.Created_At
+        FROM Bids b
+        JOIN Students s ON b.Runner_ID = s.Reg_No
+        WHERE b.Task_ID = :task_id
+        ORDER BY b.Offered_Time DESC
+    """)
+    rows = db.execute(query, {"task_id": task_id}).mappings().all()
+
+    return [
+        {
+            "bid_id": row["Bid_ID"],
+            "task_id": row["Task_ID"],
+            "runner_id": row["Runner_ID"],
+            "runner_name": row["Runner_Name"],
+            "runner_rating": float(row["Runner_Rating"]),
+            "offered_time": row["Offered_Time"].isoformat() if row["Offered_Time"] else None,
+            "bid_status": row["Bid_Status"],
+            "created_at": row["Created_At"].isoformat() if row["Created_At"] else None
+        }
+        for row in rows
+    ]
+
