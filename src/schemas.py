@@ -80,6 +80,13 @@ class TaskHandoverVerify(BaseModel):
     runner_id: str = Field(..., example="25BCE0717")
     verification_pin: str = Field(..., min_length=4, max_length=4, example="4821")
 
+    @field_validator("verification_pin")
+    def validate_pin_format(cls, v: str) -> str:
+        if not re.match(r"^[0-9]{4}$", v):
+            raise ValueError("Verification PIN must be exactly 4 numeric digits")
+        return v
+
+
 
 # ============================================================================
 # 3. BID SCHEMAS

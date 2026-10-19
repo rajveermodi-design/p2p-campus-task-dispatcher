@@ -1,8 +1,9 @@
+import os
 import concurrent.futures
 import time
 import requests
 
-BASE_URL = "http://127.0.0.1:8000"
+BASE_URL = os.getenv("BASE_URL", "http://127.0.0.1:8000")
 TASK_ID = 1
 RUNNER_ID = "25BCE0724"
 VALID_PIN = "4821"
