@@ -6,15 +6,18 @@ The frontend for the **Peer-to-Peer Campus Task & Errand Dispatcher** has been i
 
 ## 1. Visual Walkthrough & UI Showcase
 
-````carousel
-![Radar & Marketplace Flight Board](/Users/rajveermodi/.gemini/antigravity-ide/brain/767b1a82-9cc9-4f22-83ff-d818761c7f89/campus_dispatcher_main_1792417080584.png)
-<!-- slide -->
-![Flight #1 Errand Telemetry & Competing Runner Bids](/Users/rajveermodi/.gemini/antigravity-ide/brain/767b1a82-9cc9-4f22-83ff-d818761c7f89/flight_1_bids_1792417127125.png)
-<!-- slide -->
-![Campus Participant Roster & 1-Click Persona Switcher](/Users/rajveermodi/.gemini/antigravity-ide/brain/767b1a82-9cc9-4f22-83ff-d818761c7f89/roster_modal_1792417167978.png)
-<!-- slide -->
-![Live Switched Identity & Real-Time Balance Telemetry](/Users/rajveermodi/.gemini/antigravity-ide/brain/767b1a82-9cc9-4f22-83ff-d818761c7f89/switched_user_1792417191075.png)
-````
+### 1.1 Radar & Marketplace Flight Board
+![Radar & Marketplace Flight Board](./assets/campus_dispatcher_main.png)
+
+### 1.2 Flight #1 Errand Telemetry & Competing Runner Bids
+![Flight #1 Errand Telemetry & Competing Runner Bids](./assets/flight_1_bids.png)
+
+### 1.3 Campus Participant Roster & 1-Click Persona Switcher
+![Campus Participant Roster & 1-Click Persona Switcher](./assets/roster_modal.png)
+
+### 1.4 Live Switched Identity & Real-Time Balance Telemetry
+![Live Switched Identity & Real-Time Balance Telemetry](./assets/switched_user.png)
+
 
 ---
 
@@ -41,11 +44,12 @@ graph TD
 
 | Component | File | Responsibilities |
 | :--- | :--- | :--- |
-| **Air Traffic Radar** | [`frontend/radar.js`](file:///Users/rajveermodi/Documents/GitHub/p2p-campus-task-dispatcher/frontend/radar.js) | Interactive SVG canvas rendering VIT campus landmarks (Food Mall, Tech Tower, Library, SJT, Hostels), rotating sweep beam, pulsating beacon rings, and animated flight path arcs with bounty chips. |
-| **Tactical Audio Synthesizer** | [`frontend/audio.js`](file:///Users/rajveermodi/Documents/GitHub/p2p-campus-task-dispatcher/frontend/audio.js) | Pure Web Audio API procedural sound engine generating air-traffic pings, button clicks, dispatch radio tones, and escrow release chords without external audio file dependencies. |
-| **Application Controller** | [`frontend/app.js`](file:///Users/rajveermodi/Documents/GitHub/p2p-campus-task-dispatcher/frontend/app.js) | Client-side reactive state manager handling student switcher, task creator, bidding, assignment resolution, PIN verification modals, and real-time polling (every 4s). |
-| **Glassmorphic Design System** | [`frontend/style.css`](file:///Users/rajveermodi/Documents/GitHub/p2p-campus-task-dispatcher/frontend/style.css) | Custom Vanilla CSS tokens, obsidian dark mode (`#070b13`), aviation cyan (`#00e5ff`), neon emerald (`#10b981`), amber warnings, and micro-animations. |
-| **Semantic Shell** | [`frontend/index.html`](file:///Users/rajveermodi/Documents/GitHub/p2p-campus-task-dispatcher/frontend/index.html) | SEO-optimized, accessible HTML5 layout with Google Fonts (`Outfit`, `Inter`, `JetBrains Mono`). |
+| **Air Traffic Radar** | [`frontend/radar.js`](../frontend/radar.js) | Interactive SVG canvas rendering VIT campus landmarks (Food Mall, Tech Tower, Library, SJT, Hostels), rotating sweep beam, pulsating beacon rings, and animated flight path arcs with bounty chips. |
+| **Tactical Audio Synthesizer** | [`frontend/audio.js`](../frontend/audio.js) | Pure Web Audio API procedural sound engine generating air-traffic pings, button clicks, dispatch radio tones, and escrow release chords without external audio file dependencies. |
+| **Application Controller** | [`frontend/app.js`](../frontend/app.js) | Client-side reactive state manager handling student switcher, task creator, bidding, assignment resolution, PIN verification modals, and real-time polling (every 4s). |
+| **Glassmorphic Design System** | [`frontend/style.css`](../frontend/style.css) | Custom Vanilla CSS tokens, obsidian dark mode (`#070b13`), aviation cyan (`#00e5ff`), neon emerald (`#10b981`), amber warnings, and micro-animations. |
+| **Semantic Shell** | [`frontend/index.html`](../frontend/index.html) | SEO-optimized, accessible HTML5 layout with Google Fonts (`Outfit`, `Inter`, `JetBrains Mono`). |
+
 
 ---
 
