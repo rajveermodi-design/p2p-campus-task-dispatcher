@@ -1,7 +1,9 @@
 # Byte-compiled / optimized files
 __pycache__/
+*.pyc
 *.py[cod]
 *$py.class
+.pytest_cache/
 
 # Virtual environments
 venv/

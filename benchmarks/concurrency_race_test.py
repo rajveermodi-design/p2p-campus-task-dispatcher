@@ -1,8 +1,9 @@
+import os
 import concurrent.futures
 import time
 import requests
 
-BASE_URL = "http://127.0.0.1:8000"
+BASE_URL = os.getenv("BASE_URL", "http://127.0.0.1:8000")
 
 # Target errand from seed data
 TASK_ID = 1
