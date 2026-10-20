@@ -24,11 +24,14 @@
 2. Go to [Overleaf](https://www.overleaf.com), click **New Project** $\to$ **Upload Project**, and upload the zip file.
 3. Overleaf will automatically compile with pdfLaTeX.
 
-### 2. Locally via Command Line (TeX Live / MacTeX)
+### 2. Locally via Command Line
+The repository includes `IEEEtran.cls` and `tectonic` is pre-configured on this machine. To compile directly in one command:
 ```bash
 cd paper
-pdflatex manuscript.tex
-bibtex manuscript     # If using external .bib file, or pdflatex twice for inline thebibliography
+tectonic manuscript.tex
+```
+*(Or via standard TeX Live / MacTeX if installed):*
+```bash
 pdflatex manuscript.tex
 pdflatex manuscript.tex
 ```

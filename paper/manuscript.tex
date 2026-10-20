@@ -10,6 +10,12 @@
 \usepackage{multirow}
 \usepackage{url}
 \usepackage{cite}
+\usepackage{microtype}
+
+\setlength{\dbltextfloatsep}{8pt plus 2pt minus 2pt}
+\setlength{\dblfloatsep}{8pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{8pt plus 2pt minus 2pt}
+\setlength{\intextsep}{6pt plus 2pt minus 2pt}
 
 \begin{document}
 
@@ -48,7 +54,7 @@ While decentralized blockchain smart contracts \cite{wood2014ethereum} offer tru
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.95\textwidth]{figures/fig1_system_architecture}
+\includegraphics[width=0.90\textwidth]{figures/fig1_system_architecture}
 \caption{End-to-End System Architecture: 3-Tier topology highlighting the Presentation Tier, FastAPI ASGI Application Tier, and MySQL 8.0 InnoDB Storage Engine with exclusive row-level locking boundaries and active trigger integrity.}
 \label{fig:system_architecture}
 \end{figure*}
@@ -75,10 +81,10 @@ The system architecture follows a high-performance 3-tier topology engineered fo
 \subsection{Entity Formulations}
 The relational database comprises four core normalized entities:
 \begin{itemize}
-    \item $\text{Students}(\underline{\text{Reg\_No}}, \text{Name}, \text{Email}, \text{Trust\_Rating}, \text{Balance}, \text{Created\_At})$: Represents verified participants identified by institutional registration numbers.
-    \item $\text{Tasks}(\underline{\text{Task\_ID}}, \text{Requester\_ID}, \text{Runner\_ID}, \text{Pickup\_Loc}, \text{Drop\_Loc}, \text{Bounty}, \text{Status}, \text{Verification\_Pin}, \text{Created\_At})$: Encapsulates delivery requests and campus routing coordinates.
-    \item $\text{Bids}(\underline{\text{Bid\_ID}}, \text{Task\_ID}, \text{Runner\_ID}, \text{Offered\_Time}, \text{Bid\_Status}, \text{Created\_At})$: Captures competitive runner bids for available tasks.
-    \item $\text{Escrow\_Transactions}(\underline{\text{Txn\_ID}}, \text{Task\_ID}, \text{Amount}, \text{Escrow\_State}, \text{Released\_At}, \text{Updated\_At})$: Isolates held funds from student balances.
+    \item \textbf{Students} (\underline{\texttt{Reg\_No}}, \texttt{Name}, \texttt{Email}, \texttt{Trust\_Rating}, \texttt{Balance}, \texttt{Created\_At}): Verified student participants identified by institutional registration numbers.
+    \item \textbf{Tasks} (\underline{\texttt{Task\_ID}}, \texttt{Requester\_ID}, \texttt{Runner\_ID}, \texttt{Pickup\_Loc}, \texttt{Drop\_Loc}, \texttt{Bounty}, \texttt{Status}, \texttt{Verification\_Pin}, \texttt{Created\_At}): Delivery requests and campus routing coordinates.
+    \item \textbf{Bids} (\underline{\texttt{Bid\_ID}}, \texttt{Task\_ID}, \texttt{Runner\_ID}, \texttt{Offered\_Time}, \texttt{Bid\_Status}, \texttt{Created\_At}): Competitive runner bids for available tasks.
+    \item \textbf{Escrow\_Transactions} (\underline{\texttt{Txn\_ID}}, \texttt{Task\_ID}, \texttt{Amount}, \texttt{Escrow\_State}, \texttt{Released\_At}, \texttt{Updated\_At}): Financial isolation records for held task bounties.
 \end{itemize}
 
 \subsection{Formal BCNF Normalization Proof}
@@ -87,8 +93,10 @@ A relation schema $R$ is in Boyce-Codd Normal Form (BCNF) if and only if for eve
 \subsubsection{Students Relation ($R_1$)}
 The functional dependency set is:
 \begin{align*}
-    F_1 = \{ & \text{Reg\_No} \to \{\text{Name}, \text{Email}, \text{Trust\_Rating}, \text{Balance}, \text{Created\_At}\}, \\
-             & \text{Email} \to \{\text{Reg\_No}, \text{Name}, \text{Trust\_Rating}, \text{Balance}, \text{Created\_At}\} \}
+    F_1 = \{ & \text{Reg\_No} \to \{\text{Name}, \text{Email}, \text{Trust\_Rating}, \\
+             & \phantom{\text{Reg\_No} \to \{} \text{Balance}, \text{Created\_At}\}, \\
+             & \text{Email} \to \{\text{Reg\_No}, \text{Name}, \text{Trust\_Rating}, \\
+             & \phantom{\text{Email} \to \{} \text{Balance}, \text{Created\_At}\} \}
 \end{align*}
 Attribute closures yield $\{\text{Reg\_No}\}^+ = R_1$ and $\{\text{Email}\}^+ = R_1$. Minimal candidate keys are $\mathcal{K}_1 = \{\{\text{Reg\_No}\}, \{\text{Email}\}\}$. Because every determinant in $F_1$ is a candidate key and therefore a superkey, $R_1$ strictly satisfies BCNF.
 
@@ -103,7 +111,8 @@ The minimal candidate key is $\mathcal{K}_2 = \{\{\text{Task\_ID}\}\}$. The dete
 The functional dependency set is:
 \begin{align*}
     F_3 = \{ & \text{Bid\_ID} \to R_3 \setminus \{\text{Bid\_ID}\}, \\
-             & \{\text{Task\_ID}, \text{Runner\_ID}\} \to R_3 \setminus \{\text{Task\_ID}, \text{Runner\_ID}\} \}
+             & \{\text{Task\_ID}, \text{Runner\_ID}\} \to \\
+             & \quad R_3 \setminus \{\text{Task\_ID}, \text{Runner\_ID}\} \}
 \end{align*}
 Candidate keys are $\mathcal{K}_3 = \{\{\text{Bid\_ID}\}, \{\text{Task\_ID}, \text{Runner\_ID}\}\}$. Both determinants are candidate keys and superkeys. Therefore, $R_3$ is in BCNF.
 
@@ -119,17 +128,20 @@ Enforced by the unique constraint $\text{UNIQUE}(\text{Task\_ID})$, the candidat
 Let universal schema $U = R_1 \cup R_2 \cup R_3 \cup R_4$. By Heath's Theorem \cite{heath1971unacceptable}, a decomposition of $R$ into $(R_a, R_b)$ is lossless if and only if $(R_a \cap R_b) \to R_a$ or $(R_a \cap R_b) \to R_b$.
 
 Applying explicit attribute renaming $\rho_{\text{Reg\_No} \leftarrow \text{Requester\_ID}}$ on $R_2$:
-\begin{equation}
-    (R_1 \cap \rho(R_2)) = \{\text{Reg\_No}\} \to R_1 \implies R_1 \bowtie R_2 \text{ is lossless.}
-\end{equation}
+\begin{align}
+    (R_1 \cap \rho(R_2)) &= \{\text{Reg\_No}\} \to R_1 \nonumber\\
+    &\implies R_1 \bowtie R_2 \text{ is lossless.}
+\end{align}
 Similarly, for escrow transactions:
-\begin{equation}
-    (R_1 \cup R_2) \cap R_4 = \{\text{Task\_ID}\} \to R_4 \implies (R_1 \bowtie R_2) \bowtie R_4 \text{ is lossless.}
-\end{equation}
+\begin{align}
+    (R_1 \cup R_2) \cap R_4 &= \{\text{Task\_ID}\} \to R_4 \nonumber\\
+    &\implies (R_1 \bowtie R_2) \bowtie R_4 \text{ is lossless.}
+\end{align}
 For runner bids:
-\begin{equation}
-    (R_1 \cup R_2 \cup R_4) \cap R_3 = \{\text{Task\_ID}, \text{Runner\_ID}\} \to R_3 \implies \text{Lossless.}
-\end{equation}
+\begin{align}
+    (R_1 \cup R_2 \cup R_4) \cap R_3 &= \{\text{Task\_ID}, \text{Runner\_ID}\} \to R_3 \nonumber\\
+    &\implies \text{Decomposition is lossless.}
+\end{align}
 Furthermore, because each functional dependency in $F$ is defined exclusively on attributes within its respective relation schema ($\bigcup \pi_{R_i}(F) \equiv F^+$), all dependencies are fully preserved without cross-relation join overhead.
 
 \section{Task Matching \& Dispatching Model}
@@ -138,7 +150,10 @@ Campus errand systems must reconcile requester urgency with runner availability.
 \subsection{Multi-Attribute Utility Formulation}
 Let $\mathcal{T} = \{t_1, t_2, \dots, t_m\}$ be the set of active open tasks and $\mathcal{R} = \{r_1, r_2, \dots, r_n\}$ be available student runners who have submitted bids. For an errand $i \in \mathcal{T}$ and runner $j \in \mathcal{R}$, the dispatching utility $\mathcal{U}(i, j)$ is formulated as:
 \begin{equation}
-    \mathcal{U}(i, j) = w_1 \cdot \frac{\text{Trust}_j}{\text{Trust}_{\max}} - w_2 \cdot \frac{\mathcal{D}(i, j)}{D_{\max}} + w_3 \cdot \frac{\text{Bounty}_i}{B_{\max}} - w_4 \cdot \frac{\tau_j}{T_{\max}}
+\begin{aligned}
+    \mathcal{U}(i, j) &= w_1 \cdot \frac{\text{Trust}_j}{\text{Trust}_{\max}} - w_2 \cdot \frac{\mathcal{D}(i, j)}{D_{\max}} \\
+    &\quad + w_3 \cdot \frac{\text{Bounty}_i}{B_{\max}} - w_4 \cdot \frac{\tau_j}{T_{\max}}
+\end{aligned}
 \end{equation}
 where $\text{Trust}_j \in [1.0, 5.0]$ is the runner's verified peer reputation rating, $\mathcal{D}(i, j)$ is the Euclidean distance between the runner's current location and the errand pickup coordinate, $\text{Bounty}_i$ is the monetary reward, and $\tau_j$ is the offered delivery duration in minutes. The weights satisfy $\sum_{k=1}^4 w_k = 1.0$.
 
@@ -157,33 +172,35 @@ subject to:
 Algorithm~\ref{alg:dispatch} details the selection heuristic executed upon bid adjudication.
 
 \begin{algorithm}[t]
-\caption{Multi-Attribute Bid Ranking and Task Assignment}
+\caption{Multi-Attribute Bid Ranking \& Assignment}
 \label{alg:dispatch}
 \begin{algorithmic}[1]
 \REQUIRE Task $t$, Candidate Bids $\mathcal{B}_t$, Weights $(w_1, w_2, w_3, w_4)$
 \STATE $\mathcal{Q} \leftarrow \emptyset$ \COMMENT{Priority queue of candidate bids}
 \FORALL{$b \in \mathcal{B}_t$}
-    \STATE Retrieve runner profile $r \leftarrow \text{GetStudent}(b.\text{Runner\_ID})$
-    \STATE Compute $\mathcal{D} \leftarrow \text{Distance}(r.\text{Location}, t.\text{Pickup\_Loc})$
+    \STATE $r \leftarrow \text{GetStudent}(b.\text{Runner\_ID})$
+    \STATE $\mathcal{D} \leftarrow \text{Distance}(r.\text{Location}, t.\text{Pickup\_Loc})$
     \STATE Calculate utility score $\mathcal{U}(t, r)$ via Eq.~(4)
     \STATE $\mathcal{Q}.\text{Insert}(b, \mathcal{U}(t, r))$
 \ENDFOR
 \STATE $b^* \leftarrow \mathcal{Q}.\text{ExtractMax}()$
-\STATE Execute assignment transaction: \texttt{UPDATE Tasks SET Runner\_ID} = $b^*.\text{Runner\_ID}$, \texttt{Status} = \text{'assigned'} \texttt{WHERE Task\_ID} = $t.\text{Task\_ID}$;
+\STATE \textbf{Execute Assignment:}
+\STATE \quad \texttt{UPDATE Tasks SET Runner\_ID} = $b^*.\text{Runner\_ID},$
+\STATE \quad \texttt{Status} = \text{'assigned'} \texttt{WHERE Task\_ID} = $t.\text{Task\_ID}$;
 \RETURN $b^*$
 \end{algorithmic}
 \end{algorithm}
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\columnwidth]{figures/fig2_escrow_fsm}
+\includegraphics[width=0.95\columnwidth]{figures/fig2_escrow_fsm}
 \caption{Escrow Transaction State Transition Machine: Governing the lifecycle of task funds with strict balance invariance and atomic rollback boundaries.}
 \label{fig:escrow_fsm}
 \end{figure}
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\columnwidth]{figures/fig3_concurrency_race}
+\includegraphics[width=0.95\columnwidth]{figures/fig3_concurrency_race}
 \caption{Concurrency Resolution Sequence: Timeline showing InnoDB row-level lock serialization between competing payout threads.}
 \label{fig:concurrency_race}
 \end{figure}
@@ -198,28 +215,33 @@ Fig.~\ref{fig:escrow_fsm} illustrates the state transitions governing task bount
 The payout handover is implemented in stored procedure \texttt{sp\_complete\_task\_handover} as specified in Algorithm~\ref{alg:handover}.
 
 \begin{algorithm}[t]
-\caption{Pessimistic Task Handover and Escrow Release}
+\caption{Pessimistic Handover \& Escrow Release}
 \label{alg:handover}
 \begin{algorithmic}[1]
 \REQUIRE $p\_task\_id$, $p\_runner\_id$, $p\_pin$
 \STATE $\text{START TRANSACTION};$
-\STATE $\text{SELECT Verification\_Pin, Status, Bounty, Runner\_ID}$
-\STATE \quad $\text{INTO } v\_pin, v\_status, v\_bounty, v\_runner$
-\STATE \quad $\text{FROM Tasks WHERE Task\_ID} = p\_task\_id \text{ \textbf{FOR UPDATE}};$
+\STATE \textbf{SELECT} \texttt{PIN, Status, Bounty, Runner\_ID}
+\STATE \quad \textbf{INTO} $v\_pin, v\_status, v\_bounty, v\_runner$
+\STATE \quad \textbf{FROM} \texttt{Tasks} \textbf{WHERE} \texttt{Task\_ID} = $p\_task\_id$
+\STATE \quad \textbf{FOR UPDATE};
 \IF{$v\_status \notin (\text{'assigned'}, \text{'in\_transit'})$}
     \STATE $\text{SIGNAL SQLSTATE '45000'} \implies \text{Task Not Active};$
 \ENDIF
 \IF{$v\_runner \ne p\_runner\_id$}
-    \STATE $\text{SIGNAL SQLSTATE '45000'} \implies \text{Unauthorized Runner};$
+    \STATE $\text{SIGNAL SQLSTATE '45000'} \implies \text{Unauthorized};$
 \ENDIF
 \IF{$v\_pin \ne p\_pin$}
-    \STATE $\text{SIGNAL SQLSTATE '45000'} \implies \text{Invalid Authentication Token};$
+    \STATE $\text{SIGNAL SQLSTATE '45000'} \implies \text{Invalid Token};$
 \ENDIF
-\STATE $\text{UPDATE Tasks SET Status} = \text{'completed'} \text{ WHERE Task\_ID} = p\_task\_id;$
-\STATE $\text{UPDATE Escrow\_Transactions SET Escrow\_State} = \text{'RELEASED'},$
-\STATE \quad $\text{Released\_At} = \text{CURRENT\_TIMESTAMP WHERE Task\_ID} = p\_task\_id;$
-\STATE $\text{UPDATE Students SET Balance} = \text{Balance} + v\_bounty$
-\STATE \quad $\text{WHERE Reg\_No} = p\_runner\_id;$
+\STATE \texttt{UPDATE Tasks SET Status} = \text{'completed'}
+\STATE \quad \texttt{WHERE Task\_ID} = $p\_task\_id$;
+\STATE \texttt{UPDATE Escrow\_Transactions}
+\STATE \quad \texttt{SET Escrow\_State} = \text{'RELEASED'},
+\STATE \quad \texttt{Released\_At} = \texttt{NOW()}
+\STATE \quad \texttt{WHERE Task\_ID} = $p\_task\_id$;
+\STATE \texttt{UPDATE Students}
+\STATE \quad \texttt{SET Balance} = $\text{Balance} + v\_bounty$
+\STATE \quad \texttt{WHERE Reg\_No} = $p\_runner\_id$;
 \STATE $\text{COMMIT};$
 \end{algorithmic}
 \end{algorithm}
@@ -239,7 +261,7 @@ The mutual handover verification token is an out-of-band 4-digit numeric code sh
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.92\textwidth]{figures/fig4_latency_and_scaling}
+\includegraphics[width=0.82\textwidth]{figures/fig4_latency_and_scaling}
 \caption{Empirical Performance Benchmarks: (a) Mean query latency and speedup using composite B-Tree indexes ($N = 500$ iterations). (b) High-contention payout stress test: Double-spending leakage rate and contention resolution latency across scaling concurrent worker threads.}
 \label{fig:latency_and_scaling}
 \end{figure*}
@@ -248,16 +270,24 @@ The mutual handover verification token is an out-of-band 4-digit numeric code sh
 To enforce system invariants independently of application middleware bugs, we embed business logic directly within database triggers.
 
 \subsection{Self-Bidding Prevention Trigger}
-Marketplace fairness requires that task requesters cannot place bids on their own errands. The trigger \texttt{trg\_prevent\_self\_bid} fires before insert operations on \texttt{Bids}:
-\begin{align*}
-    &\text{\textbf{TRIGGER} trg\_prevent\_self\_bid \textbf{BEFORE INSERT ON} Bids} \\
-    &\text{\textbf{BEGIN}} \\
-    &\quad \text{SELECT Requester\_ID INTO } v\_req \text{ FROM Tasks WHERE Task\_ID} = \text{NEW.Task\_ID;} \\
-    &\quad \text{\textbf{IF} } v\_req = \text{NEW.Runner\_ID \textbf{THEN}} \\
-    &\quad\quad \text{SIGNAL SQLSTATE '45000'} \text{ SET MESSAGE\_TEXT} = \text{'Requester cannot bid on own task';} \\
-    &\quad \text{\textbf{END IF;}} \\
-    &\text{\textbf{END}}
-\end{align*}
+Marketplace fairness requires that task requesters cannot place bids on their own errands. The trigger \texttt{trg\_prevent\_self\_bid} fires before insert operations on \texttt{Bids} as specified in Algorithm~\ref{alg:trigger_self_bid}:
+
+\begin{algorithm}[t]
+\caption{Self-Bidding Prevention Trigger}
+\label{alg:trigger_self_bid}
+\begin{algorithmic}[1]
+\STATE \textbf{TRIGGER} \texttt{trg\_prevent\_self\_bid}
+\STATE \textbf{BEFORE INSERT ON} \texttt{Bids} \textbf{FOR EACH ROW}
+\STATE \textbf{BEGIN}
+\STATE \quad \textbf{SELECT} \texttt{Requester\_ID} \textbf{INTO} $v\_req$ \textbf{FROM} \texttt{Tasks}
+\STATE \quad\quad \textbf{WHERE} \texttt{Task\_ID} = \texttt{NEW.Task\_ID};
+\STATE \quad \textbf{IF} $v\_req = \texttt{NEW.Runner\_ID}$ \textbf{THEN}
+\STATE \quad\quad \textbf{SIGNAL} \texttt{SQLSTATE '45000'}
+\STATE \quad\quad \textbf{SET} \texttt{MESSAGE\_TEXT} = \text{'Self-bid denied'};
+\STATE \quad \textbf{END IF};
+\STATE \textbf{END}
+\end{algorithmic}
+\end{algorithm}
 
 \subsection{Automated Bid Adjudication Trigger}
 When a requester assigns a runner to an open errand, competing runner bids must be resolved atomically. The trigger \texttt{trg\_after\_task\_assignment} executes after update operations on \texttt{Tasks}, transitioning the winning runner's bid to \texttt{accepted} and automatically marking all other pending bids for that task as \texttt{rejected} within the same transaction scope.
@@ -279,65 +309,67 @@ We evaluate the composite B-Tree index \texttt{idx\_tasks\_status\_id} on \textt
 
 \begin{table*}[t]
 \centering
+\footnotesize
 \caption{Empirical Query Execution Plan Analysis and Runtime Latency Benchmark ($N = 500$ Iterations)}
 \label{tab:index_benchmark}
-\begin{tabular}{lllrrrr}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lllrrrr@{}}
 \toprule
-\textbf{Target Workload} & \textbf{Access Path} & \textbf{Access Mechanism} & \textbf{Est. Rows Scanned} & \textbf{Mean Latency} & \textbf{P95 Latency} & \textbf{Speedup / Gain} \\
+\textbf{Workload} & \textbf{Access Path} & \textbf{Mechanism} & \textbf{Rows Scanned} & \textbf{Mean Latency} & \textbf{P95 Latency} & \textbf{Speedup} \\
 \midrule
 Marketplace Feed & Full Table Scan & Engine Scan (\texttt{ALL}) & 9,891 & 6.8837~ms & 8.3103~ms & Baseline \\
 Marketplace Feed & Indexed & \texttt{idx\_tasks\_status\_id} & 495 & 4.6063~ms & 5.4223~ms & \textbf{+33.1\% faster} \\
 \midrule
 Runner Bids Query & Full Table Scan & Engine Scan (\texttt{ALL}) & $\approx 10,000$ & 4.7457~ms & --- & Baseline \\
-Runner Bids Query & Indexed & \texttt{idx\_bids\_runner\_status} & $\approx 5$ & 0.4226~ms & --- & \textbf{+91.1\% ($11.2\times$ faster)} \\
+Runner Bids Query & Indexed & \texttt{idx\_bids\_runner\_status} & $\approx 5$ & 0.4226~ms & --- & \textbf{+91.1\% ($11.2\times$)} \\
 \bottomrule
-\end{tabular}
+\end{tabular*}
 \end{table*}
 
 As detailed in Table~\ref{tab:index_benchmark} and visualized in Fig.~\ref{fig:latency_and_scaling}(a), the indexed access path for the marketplace feed reduces the row scan volume from 9,891 to 495 rows, delivering a 33.1\% reduction in mean latency (from 6.8837~ms to 4.6063~ms) and reducing 95th-percentile tail latency from 8.3103~ms to 5.4223~ms. For runner bid lookups, the composite key reduces execution time from 4.7457~ms to 0.4226~ms, representing an $11.2\times$ acceleration due to direct B-Tree index traversal.
 
-\subsection{Concurrency & Double-Spending Stress Benchmark}
+\subsection{Concurrency \& Double-Spending Stress Benchmark}
 To evaluate transaction isolation under write contention, we subjected the payout handover to multi-worker parallel stress tests. We compare three concurrency control paradigms:
 \begin{enumerate}
-    \item \textbf{Naive Application-Level Check:} Un-isolated read-then-write pattern in application code without database locks.
-    \item \textbf{Optimistic Concurrency Control (OCC):} Version-checked updates where conflicting updates trigger application retries.
+    \item \textbf{Naive Application-Level Check:} Read-then-write in application code without database locks.
+    \item \textbf{Optimistic Concurrency Control (OCC):} Version-checked updates where conflicts trigger retries.
     \item \textbf{Pessimistic Row-Level Locking (Proposed):} Exclusive row locks acquired via \texttt{SELECT ... FOR UPDATE}.
 \end{enumerate}
 
 \begin{table}[t]
 \centering
+\footnotesize
 \caption{Comparative Multi-Threaded Payout Stress Benchmark}
 \label{tab:concurrency_comparison}
-\begin{tabular}{lrrrrr}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lcrrrc@{}}
 \toprule
-\textbf{Concurrency Model} & \textbf{Threads} & \textbf{Success} & \textbf{Leakage} & \textbf{Mean Lat.} & \textbf{Invariant} \\
+\textbf{Model} & \textbf{Th.} & \textbf{Win} & \textbf{Leak} & \textbf{Latency} & \textbf{Invariant} \\
 \midrule
-\multirow{4}{*}{Naive (No Lock)} 
+\multirow{4}{*}{\shortstack[l]{Naive\\(No Lock)}} 
  & 1  & 1/1   & 0.0\%  & 12.1~ms & Preserved \\
  & 10 & 4/10  & 30.0\% & 14.8~ms & \textbf{VIOLATED} \\
  & 20 & 11/20 & 50.0\% & 18.2~ms & \textbf{VIOLATED} \\
  & 50 & 40/50 & 78.0\% & 24.6~ms & \textbf{VIOLATED} \\
 \midrule
-\multirow{4}{*}{Optimistic (OCC)} 
+\multirow{4}{*}{\shortstack[l]{Optimistic\\(OCC)}} 
  & 1  & 1/1  & 0.0\% & 12.4~ms & Preserved \\
  & 10 & 1/10 & 0.0\% & 38.6~ms & Preserved \\
  & 20 & 1/20 & 0.0\% & 74.2~ms & Preserved \\
  & 50 & 1/50 & 0.0\% & 142.1~ms & Preserved \\
 \midrule
-\multirow{4}{*}{\textbf{Pessimistic (Ours)}} 
+\multirow{4}{*}{\shortstack[l]{\textbf{Pessimistic}\\\textbf{(Ours)}}} 
  & \textbf{1}  & \textbf{1/1}  & \textbf{0.0\%} & \textbf{14.2~ms} & \textbf{Preserved} \\
  & \textbf{10} & \textbf{1/10} & \textbf{0.0\%} & \textbf{30.5~ms} & \textbf{Preserved} \\
  & \textbf{20} & \textbf{1/20} & \textbf{0.0\%} & \textbf{48.2~ms} & \textbf{Preserved} \\
  & \textbf{50} & \textbf{1/50} & \textbf{0.0\%} & \textbf{98.4~ms} & \textbf{Preserved} \\
 \bottomrule
-\end{tabular}
+\end{tabular*}
 \end{table}
 
 As documented in Table~\ref{tab:concurrency_comparison} and plotted in Fig.~\ref{fig:latency_and_scaling}(b):
 \begin{itemize}
-    \item \textbf{Naive Model Vulnerability:} Under naive application-level checks, escalating concurrency causes catastrophic double-spending. At 10 parallel threads, 4 threads succeed in claiming the payout, causing Rs.~180.00 of illegitimate wallet credits. At 50 threads, 40 claims succeed (78.0\% financial leakage).
-    \item \textbf{OCC Overhead:} While OCC preserves the financial balance invariant, write contention causes high abort rates. At 50 threads, OCC incurs severe retry overhead with mean latency surging to 142.1~ms.
-    \item \textbf{Pessimistic Locking Efficiency:} Our proposed InnoDB pessimistic locking engine strictly admits exactly 1 payout claim across all thread configurations (0.0\% double-spending), guaranteeing 100\% mathematical balance invariance while achieving sub-50~ms resolution up to 20 threads.
+    \item \textbf{Naive Model Vulnerability:} Under naive checks, concurrency causes severe double-spending. At 10 threads, 4 succeed (Rs.~180.00 illegitimate credits); at 50 threads, 40 succeed (78.0\% financial leakage).
+    \item \textbf{OCC Overhead:} While OCC preserves balance invariance, write contention causes high abort storms; at 50 threads, retry overhead drives mean latency to 142.1~ms.
+    \item \textbf{Pessimistic Locking Efficiency:} Our proposed InnoDB engine strictly admits exactly 1 payout claim across all thread configurations (0.0\% leakage), preserving 100\% mathematical invariance with sub-50~ms resolution up to 20 threads.
 \end{itemize}
 
 \section{Related Work}
@@ -356,6 +388,9 @@ In this paper, we presented the architectural design, formal mathematical normal
 Benchmark evaluations on a 10,000-task scale dataset confirmed that composite B-Tree indexing accelerates open task retrieval by 33.1\% and runner bid queries by $11.2\times$. Stress tests up to 50 concurrent threads demonstrated that while naive implementations suffer up to 78.0\% financial leakage, our engine maintains 100\% balance invariance with deterministic sub-35ms resolution. Future work will investigate geo-spatial R-Tree spatial indexing and automated peer reputation decay models.
 
 \begin{thebibliography}{99}
+\footnotesize
+\setlength{\itemsep}{1.0pt plus 0.5pt}
+\setlength{\parskip}{0pt}
 
 \bibitem{gray1992transaction}
 J.~Gray and A.~Reuter, \emph{Transaction Processing: Concepts and Techniques}. San Francisco, CA: Morgan Kaufmann, 1992.
