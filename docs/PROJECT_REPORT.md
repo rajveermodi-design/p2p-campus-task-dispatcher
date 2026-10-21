@@ -367,6 +367,12 @@ While the current system is fully functional and stable, several exciting enhanc
 - **Campus Map & Route Tracking:** Adding an interactive campus map (e.g., using OpenStreetMap or Leaflet.js) to show walking distances between academic blocks and hostels.
 - **Push Notifications & WhatsApp Alerts:** Sending automated WhatsApp or web-push notifications when a bid is accepted or when a runner arrives at the hostel gate.
 - **Item Photo Proof:** Allowing requesters to upload a photo of the receipt or item to verify costs before handover.
+- **Advanced Cryptographic & Proximity Verification (Mitigating PIN Brute-Forcing):**
+  - *Current Vulnerability Analysis:* The current prototype relies on a 4-digit numeric verification PIN. A 4-digit space contains only $10^4 = 10,000$ possible combinations ($0000$–$9999$). While the backend enforces an automated 3-attempt lockout policy, numeric OTPs are inherently prone to automated brute-force attacks if rate-limiting fails, or to shoulder-surfing in busy campus corridors.
+  - *Proposed Higher-Security Alternatives:*
+    1. **Dynamic Time-Expiring QR Code Scanning:** Instead of verbal PIN exchange, the requester’s screen generates an encrypted, cryptographically signed QR code (HMAC-SHA256) that automatically rotates every 30–60 seconds. The runner scans this QR code using their smartphone camera to trigger instant verification. Because the token is a high-entropy 256-bit hash, brute-forcing is mathematically impossible ($2^{-256}$), and physical line-of-sight to the requester's device screen is mandatory.
+    2. **Near Field Communication (NFC) "Tap-to-Verify":** Leveraging short-range NFC built into modern smartphones or student smart RFID campus cards. When the runner hands over the parcel, tapping the two devices together executes an encrypted mutual handshake. Since NFC strictly requires physical proximity within 2 to 4 centimeters, remote network spoofing or guessing is completely thwarted.
+    3. **Bluetooth Low Energy (BLE) Proximity Fencing:** Combining authentication with BLE RSSI (signal strength) telemetry to ensure that both student devices are within a confirmed 1-to-2 meter physical radius before the escrow release action can be unlocked.
 
 ---
 
