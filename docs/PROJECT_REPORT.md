@@ -19,17 +19,9 @@
 
 ---
 
-## ACKNOWLEDGEMENT
-
-I would like to express my sincere gratitude to my faculty guide and the Department of Computer Science and Engineering at Vellore Institute of Technology for providing the guidance, facilities, and academic encouragement necessary to complete this project.
-
-I am also thankful to my peers and fellow hostel-mates whose everyday campus challenges inspired the motivation and feature set of this application.
-
----
-
 ## ABSTRACT
 
-In large university campuses with tens of thousands of residential students, daily micro-errands—such as urgent assignment printouts, lab component pickups, stationary purchases, and cafeteria parcels—often cause considerable loss of study time and personal productivity. While commercial delivery apps (Swiggy, Zomato, Dunzo) exist outside the campus, they cannot enter hostel blocks, cannot access restricted academic buildings or labs, and have minimum order limits that make small errands unaffordable. Consequently, students rely on informal WhatsApp or Telegram groups, which are chaotic, prone to forgotten requests, and carry financial risks like unpaid runners or disputed payments.
+In large university campuses with tens of thousands of residential students, daily micro-errands—such as urgent assignment printouts, lab component pickups, stationary purchases, and cafeteria parcels—often cause considerable loss of study time and personal productivity. While commercial delivery apps (Swiggy, Zomato, Zepto) exist outside the campus, they cannot enter hostel blocks, cannot access restricted academic buildings or labs, and have minimum order limits that make small errands unaffordable. Consequently, students rely on informal WhatsApp or Telegram groups, which are chaotic, prone to forgotten requests, and carry financial risks like unpaid runners or disputed payments.
 
 To address this gap, **Campus Runner** is designed as a centralized, secure, peer-to-peer (P2P) task dispatch platform tailored specifically for college campuses. It enables students who need an errand done (**Requesters**) to post tasks with a specific monetary reward (**Bounty**), while students who are already near that location (**Runners**) can place bids to fulfill it. 
 
