@@ -21,3 +21,18 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# LaTeX build artifacts
+*.aux
+*.lof
+*.lot
+*.out
+*.toc
+*.log
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.xdv
+
+# Academic manuscripts, reports, and publication artifacts
+academic_artifacts/

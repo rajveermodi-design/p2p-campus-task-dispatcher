@@ -65,10 +65,33 @@ The system is structured into four tightly integrated relational modules:
 
 ```text
 campus-errand-dispatcher/
+├── frontend/                   # Tactical Air Traffic Control web interface (HTML5, Vanilla CSS, Web Audio)
+│   ├── index.html              # Core application layout & radar dashboard
+│   ├── style.css               # Glassmorphic aviation design system & animations
+│   ├── radar.js                # Interactive campus radar & animated flight paths
+│   ├── audio.js                # Procedural Web Audio API synthesizer
+│   └── app.js                  # Client controller & real-time ACID event stream
 ├── sql/                        # MySQL 8.0 DDL, Views, Indexes, Stored Procedures, and Triggers
 ├── src/                        # FastAPI + SQLAlchemy backend application layer
 ├── benchmarks/                 # Multi-threaded concurrency & index performance tests (for paper metrics)
 ├── paper/                      # Conference paper manuscript and architecture diagrams
-├── docs/                       # Formal relational algebra & BCNF normalization proofs
+├── docs/                       # Project report (docs/PROJECT_REPORT.md) & relational proofs
 ├── requirements.txt            # Python dependencies
 └── README.md                   # Project documentation
+```
+
+---
+
+## 6. Accessing the Web Frontend
+
+The frontend is served directly by the FastAPI backend on port 8000:
+
+```bash
+uvicorn src.main:app --reload --port 8000
+```
+
+Open your browser to:
+* **Interactive Web App:** [http://localhost:8000/](http://localhost:8000/)
+* **Interactive API Docs (Swagger):** [http://localhost:8000/docs](http://localhost:8000/docs)
+* **System Health Check:** [http://localhost:8000/health](http://localhost:8000/health)
+
