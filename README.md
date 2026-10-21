@@ -75,7 +75,7 @@ campus-errand-dispatcher/
 ├── src/                        # FastAPI + SQLAlchemy backend application layer
 ├── benchmarks/                 # Multi-threaded concurrency & index performance tests (for paper metrics)
 ├── paper/                      # Conference paper manuscript and architecture diagrams
-├── docs/                       # Formal relational algebra & BCNF normalization proofs
+├── docs/                       # Project report (docs/PROJECT_REPORT.md) & relational proofs
 ├── requirements.txt            # Python dependencies
 └── README.md                   # Project documentation
 ```
